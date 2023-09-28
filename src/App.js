@@ -24,6 +24,8 @@ const initialFriends = [
 export default function App() {
   const [showAddfrnd, setshowAddfrnd] = useState(false);
   const [friends, setFriends] = useState(initialFriends);
+  const [showSplitBill, setshowSplitBill] = useState(false);
+  const [selectedFriend, setselectedFriend] = useState(null);
   function handleShowAddFriend() {
     setshowAddfrnd((show) => !show);
   }
@@ -31,16 +33,23 @@ export default function App() {
     setFriends((friends) => [...friends, friend]);
     setshowAddfrnd(false);
   }
+  function handleSelectClicked() {
+    setshowSplitBill((select) => !select);
+  }
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList friends={friends} />
+        <FriendsList
+          friends={friends}
+          OnSelectClicked={handleSelectClicked}
+          showSplitBill={showSplitBill}
+        />
         {showAddfrnd && <FormAddFriend onAddFriends={handleAddFriends} />}
         <Button onClick={handleShowAddFriend}>
           {showAddfrnd ? "close" : "Add friend"}
         </Button>
       </div>
-      <FormSplitBill />
+      {showSplitBill && <FormSplitBill />}
     </div>
   );
 }
@@ -51,17 +60,22 @@ function Button({ children, onClick }) {
     </button>
   );
 }
-function FriendsList({ friends }) {
+function FriendsList({ friends, OnSelectClicked, showSplitBill }) {
   return (
     <ul>
       {friends.map((friend) => (
-        <Friend friend={friend} key={friend.id} />
+        <Friend
+          friend={friend}
+          key={friend.id}
+          OnSelectClicked={OnSelectClicked}
+          showSplitBill={showSplitBill}
+        />
       ))}
     </ul>
   );
 }
 
-function Friend({ friend }) {
+function Friend({ friend, OnSelectClicked, showSplitBill }) {
   return (
     <li>
       <img src={friend.image} alt={friend.name} />
@@ -77,7 +91,9 @@ function Friend({ friend }) {
         </p>
       )}
       {friend.balance === 0 && <p>You and {friend.name} are even</p>}
-      <Button>Select</Button>
+      <Button onClick={OnSelectClicked}>
+        {!showSplitBill ? "Select" : "Close"}
+      </Button>
     </li>
   );
 }
